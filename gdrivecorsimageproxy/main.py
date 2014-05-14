@@ -15,10 +15,22 @@
 # limitations under the License.
 #
 import webapp2
+from google.appengine.api import urlfetch
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        imageId = self.request.get('imageId')
+        url = 'http://drive.google.com/uc?export=view&id=' + imageId
+
+        response = urlfetch.fetch(url=url,
+                                  method=urlfetch.GET)
+
+        #contentTypeHeader = self.response.headers.get('Content-Type')
+
+        self.response.headers.add_header("Access-Control-Allow-Origin", '*')
+        self.response.headers['Content-Type'] = 'image/png'
+        self.response.status = response.status_code
+        self.response.write(response.content)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
